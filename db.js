@@ -4,7 +4,7 @@ const { Pool } = require('pg');
 let host = process.env.host;
 let database = process.env.database;
 let port = process.env.port;
-let username = process.env.username;
+let username = process.env.dbusername;
 let password = process.env.password;
 
 let connectionString = 
@@ -25,8 +25,7 @@ let saveAddress = (street, city, state, postalCode) => {
 */
 let savePlace = (name, location) => {
     return pool.query(`insert into nearbyplaces.place(name, location) values ($1, $2)`, [name, location])
-    .then(() => console.log('Place was saved'))
-    .catch(e => console.log(e));
+    .then(() => console.log('Place was saved'));
 }
 
 let saveCustomer = (name, email, password) => {
@@ -35,7 +34,8 @@ let saveCustomer = (name, email, password) => {
 }
 
 let getPlaces = () => {
-    let sql = `select p.name, p.location`;
+    let sql = `select p.name, p.location,  
+    from nearbyplaces.place p `;
     return pool.query(sql)
     .then(result => result.rows);
 }
@@ -49,13 +49,13 @@ let findPlaces = (name, location) => {
     where 
     (lower(p.name) like lower('${!name ? '%%' : `%${name}%`}')) 
     and (lower(p.location) like lower('${!location ? '%%' : `%${location}%`}')) 
-    `;
+    group by p.name, p.location `;
     console.log(sql);
     return pool.query(sql)
     .then(result => result.rows);
 }
 
-let addReview = (placeid, comment, rating, customerid) => {
+let addReview = (placeName, comment, rating, customerName) => {
     return pool.query(`insert into nearbyplaces.review(placeid, comment, rating, customerid) 
     values (
     (select id from nearbyplaces.place
@@ -63,8 +63,8 @@ let addReview = (placeid, comment, rating, customerid) => {
     $2, $3, 
     (select id from nearbyplaces.customer
     where name = $4)        
-    )`, [placeid, comment, rating, customerid])
+    )`, [placeName, comment, rating, customerName])
     .then(() => {console.log('Review added.'); });
 }
 
-module.exports = { savePlace, saveCustomer, getPlaces, findPlaces };
+module.exports = { savePlace, saveCustomer, getPlaces, findPlaces, addReview };

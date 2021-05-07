@@ -8,8 +8,6 @@ const port = process.env.PORT || 4002;
 app.use(express.json());
 app.use(cors());
 
-//let places = [];
-
 app.get('/', (request, response) => {
     response.send('Welcome to mynearbyplaces serverside. This is the home page of the database.');
 });
@@ -29,11 +27,19 @@ app.get('/places', (request, response) => {
 });
 
 
-//app.post('/review/:placeName', (request, response) => {
-//});
+app.post('/review/:placeName', (request, response) => {
+    let placeName = request.params.placeName;
+    //let placeid = request.something;
+    let comment = request.body.comment;
+    let rating = request.body.rating;
+    let customerName = request.body.customerName;
+    db.addReview(placeName, comment, rating, customerName)
+    .then(() => response.send(`The review was added successfully.`))
+    .catch(e => {console.log(e); response.status(500).send('There was a problem adding the place.')});
+});
 
 
-app.get('/search/:placeName/:location', (request, response) => {
+app.get('/search/:placeName?/:location?', (request, response) => {
     let placeName = request.query.placeName;
     let location = request.query.location;
     console.log(`name: ${placeName} - ${typeof(placeName)}`);
