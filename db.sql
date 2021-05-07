@@ -18,6 +18,6 @@ create table nearbyplaces.review
 	id bigserial primary key,
 	placeid integer references nearbyplaces.place(id),
 	comment text,
-	rating integer not null,
+	rating integer,
 	customerid integer references nearbyplaces.customer(id)
 );

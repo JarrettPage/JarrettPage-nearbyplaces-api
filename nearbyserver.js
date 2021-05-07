@@ -38,7 +38,6 @@ app.post('/review/:placeName', (request, response) => {
     .catch(e => {console.log(e); response.status(500).send('There was a problem adding the place.')});
 });
 
-
 app.get('/search/:placeName?/:location?', (request, response) => {
     let placeName = request.query.placeName;
     let location = request.query.location;
@@ -47,7 +46,6 @@ app.get('/search/:placeName?/:location?', (request, response) => {
     db.findPlaces(placeName, location)
     .then(places => response.json(places))
     .catch(e => {console.log(e); response.status(500).send('There was a problem finding the place.')});
-    
 });
 
 app.listen(port, () => console.log('Listening on port ' + port));
